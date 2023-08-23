@@ -1,80 +1,49 @@
 #include<iostream>
 #include<cmath>
 #include<climits>
+#include<queue>
 #include<vector>
+#include<algorithm>
 #define i 9999
 using namespace std;
-int NO_PARENT = -1;
-
-vector<vector<string>>Paths;
-void printPath(int currentVertex, vector<int> parents,vector<string>&Places)
-{
-	if (currentVertex == NO_PARENT) {
-		return;
-	}
-	printPath(parents[currentVertex], parents,Places);
-	cout << Places[currentVertex] << "-> ";
-}
-
-void printSolution(int startVertex, vector<int> distances,
-				vector<int> parents,vector<string>&Places,int endVertex)
-{
-    	
-            cout<<"Distance = ";
-			cout << distances[endVertex] <<endl;
-			printPath(endVertex, parents,Places);
-}
-
-
-void dijkstra(vector<vector<int> > adjacencyMatrix,
-			int startVertex,vector<string>&Places,int endVertex)
-{
-	int nVertices = adjacencyMatrix[0].size();
-	vector<int> shortestDistances(nVertices);	
-	vector<bool> added(nVertices);
-	
-	for (int vertexIndex = 0; vertexIndex < nVertices;
-		vertexIndex++) {
-		shortestDistances[vertexIndex] = INT_MAX;
-		added[vertexIndex] = false;
-	}
-	shortestDistances[startVertex] = 0;
-
-	vector<int> parents(nVertices);
-
-	parents[startVertex] = NO_PARENT;
-
-	for (int r = 1; r < nVertices; r++) {
-		int nearestVertex = -1;
-		int shortestDistance = INT_MAX;
-		for (int vertexIndex = 0; vertexIndex < nVertices;
-			vertexIndex++) {
-			if (!added[vertexIndex]
-				&& shortestDistances[vertexIndex]
-					< shortestDistance) {
-				nearestVertex = vertexIndex;
-				shortestDistance
-					= shortestDistances[vertexIndex];
-			}
-		}
-		added[nearestVertex] = true;
-		for (int vertexIndex = 0; vertexIndex < nVertices;
-			vertexIndex++) {
-			int edgeDistance
-				= adjacencyMatrix[nearestVertex]
-								[vertexIndex];
-
-			if (edgeDistance > 0
-				&& ((shortestDistance + edgeDistance)
-					< shortestDistances[vertexIndex])) {
-				parents[vertexIndex] = nearestVertex;
-				shortestDistances[vertexIndex]
-					= shortestDistance + edgeDistance;
-			}
-		}
-	}
-
-	printSolution(startVertex, shortestDistances, parents,Places,endVertex);
+void dijkstra(vector<vector<int>>&adj,int src,vector<string>&places,int des){
+priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>pq;
+        pq.push({0,src});
+        int n=places.size();
+        vector<int>ans(n+1,INT_MAX);
+        ans[src]=0;
+        vector<int>par(n+1,INT_MAX);
+        while(pq.empty()==0){
+            int dis=pq.top().first;
+            int node=pq.top().second;
+          
+            pq.pop();
+            for(int j=0;j<adj[node].size();j++){
+                int dest=j;
+                int dist=adj[node][j];
+                if(dis+dist<ans[dest]){
+                    ans[dest]=dis+dist;
+                    pq.push({dis+dist,dest});
+                    par[dest]=node;
+                }
+            }
+        }
+    
+       
+     cout<<"Distance "<<ans[des]<<endl;
+        vector<int>order;
+      int turn=des;
+        while(par[turn]!=INT_MAX){
+            order.push_back(turn);
+            turn=par[turn];
+        }
+        order.push_back(turn);
+        reverse(order.begin(),order.end());
+        for(int k=0;k<order.size();k++){
+         cout<<places[order[k]]<<"->";
+        }
+        cout<<endl;
+        return;
 }
 int main(){
 vector<string>Places={"College Gate","AB Hostel","SBI Bank","KCH Hostel","SNH Hostel","SPS 9-12","Pragya Bhawan","Canteen","Civil Department","Electronics Department","Electrical Department","Nescafe",
